@@ -1,3 +1,3 @@
-pub mod randid;
-pub mod client;
 pub mod api;
+pub mod client;
+pub mod randid;

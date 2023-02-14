@@ -1,4 +1,7 @@
-use crate::{randid::{RandID, self}, api::responses::{StatusResponse, StartResponse, EventsResponse}};
+use crate::{
+    api::responses::{EventsResponse, StartResponse, StatusResponse},
+    randid::{self, RandID},
+};
 
 /// An Omegle client that stores relevant information about the session and allows for easier and,
 /// most importantly, contextual calling of the API.
@@ -8,7 +11,7 @@ pub struct Client {
     pub endpoint: String,
     pub language: String,
     pub cc: String,
-    
+
     pub chat_id: Option<String>,
 
     rc: reqwest::blocking::Client,
@@ -16,7 +19,7 @@ pub struct Client {
 
 impl Default for Client {
     fn default() -> Self {
-        Client { 
+        Client {
             randid: randid::generate(),
             interests: vec![],
             endpoint: "https://omegle.com".to_string(),
@@ -25,10 +28,10 @@ impl Default for Client {
             chat_id: None,
             rc: reqwest::blocking::ClientBuilder::default()
                 .build()
-                .expect("couldn't create client")
+                .expect("couldn't create client"),
         }
     }
-} 
+}
 
 impl Client {
     pub fn add_interest(mut self, value: String) {
@@ -37,7 +40,9 @@ impl Client {
 
     /// Blockingly starts a new chat.
     pub fn new_chat(&mut self) -> Result<StartResponse, anyhow::Error> {
-        let request = self.rc.post(format!("{}/start", self.endpoint))
+        let request = self
+            .rc
+            .post(format!("{}/start", self.endpoint))
             .query(&("caps", "recaptcha2,t3"))
             .query(&("firstevents", "1"))
             .query(&("spid", ""))
@@ -46,8 +51,7 @@ impl Client {
             .query(&("lang", &self.language))
             .build()?;
 
-        let response = self.rc.execute(request)?
-            .json::<StartResponse>()?;
+        let response = self.rc.execute(request)?.json::<StartResponse>()?;
 
         self.chat_id = Some(response.client_id.clone());
 
@@ -56,12 +60,13 @@ impl Client {
 
     /// Blockingly requests the events of a chat.
     pub fn events(&self) -> Result<EventsResponse, anyhow::Error> {
-        let request = self.rc.post(format!("{}/events", self.endpoint))
+        let request = self
+            .rc
+            .post(format!("{}/events", self.endpoint))
             .query(&("id", &self.chat_id))
             .build()?;
 
-        let response = self.rc.execute(request)?
-            .json::<EventsResponse>()?;
+        let response = self.rc.execute(request)?.json::<EventsResponse>()?;
 
         Ok(response)
     }
@@ -70,7 +75,9 @@ impl Client {
     ///
     /// Returns whether disconnecting succeeded.
     pub fn send(&self, msg: String) -> Result<bool, anyhow::Error> {
-        let request = self.rc.post(format!("{}/send", self.endpoint))
+        let request = self
+            .rc
+            .post(format!("{}/send", self.endpoint))
             .query(&("msg", msg))
             .query(&("id", &self.chat_id))
             .build()?;
@@ -82,11 +89,13 @@ impl Client {
         Ok(response == "win")
     }
 
-    /// Blockingly disconnects from a chat. 
+    /// Blockingly disconnects from a chat.
     ///
     /// Returns whether disconnecting succeeded.
     pub fn disconnect(&self) -> Result<bool, anyhow::Error> {
-        let request = self.rc.post(format!("{}/disconnect", self.endpoint))
+        let request = self
+            .rc
+            .post(format!("{}/disconnect", self.endpoint))
             .query(&("id", &self.chat_id))
             .build()?;
 
@@ -99,8 +108,7 @@ impl Client {
 }
 /// Sends a request to Omegle's API on the /status path.
 pub fn status() -> Result<StatusResponse, anyhow::Error> {
-    let response = reqwest::blocking::get("https://omegle.com/status")?
-        .json::<StatusResponse>()?;
+    let response = reqwest::blocking::get("https://omegle.com/status")?.json::<StatusResponse>()?;
 
     Ok(response)
 }

@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 /// Maps the response that the path /status on the omegle endpoint returns.
 ///
@@ -64,7 +64,7 @@ pub struct StatusResponse {
     /// Names of the available endpoints.
     ///
     /// Names as in the subdomain of the domain omegle.com
-    pub servers: Vec<String>
+    pub servers: Vec<String>,
 }
 
 /// Maps the response that the path /start (with the required query string) on the omegle endpoint
@@ -75,7 +75,7 @@ pub struct StartResponse {
     pub client_id: String,
 
     /// Events. Each vec contains and event and its arguments.
-    pub events: Vec<Vec<String>>
+    pub events: Vec<Vec<String>>,
 }
 
 // Response that is returned when a request is sent on Omegle's API on the /events path with the

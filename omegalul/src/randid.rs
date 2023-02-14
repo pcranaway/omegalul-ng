@@ -14,4 +14,4 @@ pub fn generate() -> RandID {
             charset[idx] as char
         })
         .collect()
-} 
+}
